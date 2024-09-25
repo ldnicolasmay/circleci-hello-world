@@ -33,6 +33,23 @@ jobs:
           name: "cat README"
           command: "cat README.md"
 
+  build-artifacts:
+    docker:
+      - image: cimg/base:current
+    working_directory: /tmp
+    steps:
+      - run:
+          name: "Create dummy artifacts"
+          command: |
+            echo "my artifact file" > /tmp/artifact-1;
+            mkdir /tmp/artifacts;
+            echo "my artifact files in a dir" > /tmp/artifacts/artifact-2;
+      - store_artifacts:
+          path: /tmp/artifact-1
+          destination: artifact-file
+      - store_artifacts:
+          path: /tmp/artifacts
+
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
 workflows:
@@ -40,7 +57,9 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - say-hello
-  cat-readme-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  cat-readme-workflow:
     jobs:
       - cat-readme
+  build-artifacts-workflow:
+    jobs:
+      - build-artifacts
